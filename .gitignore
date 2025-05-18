@@ -1,0 +1,43 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# Gradle (если используешь Gradle — можно оставить)
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+.idea/
+*.iml
+*.iws
+out/
+
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+.env
+*.env
+
+*.class
+
+*.swp
+*.tmp
+
+test-output/
+surefire-reports/
+
+*.h2.db
+*.mv.db
+
+.spring-boot-devtools.properties
+.spring/
+
+.vscode/
+
+.jrebel/
+rebel.xml
