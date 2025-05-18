@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+
+  profile-service:
+#    image: profile-service:latest
+    build:
+      context: profile-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./profile-service/.env
+    environment:
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    container_name: postgresql
+    image: postgres:17.2
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: profiles_db
+
+  # Redis
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+#  # RabbitMQ
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    environment:
+#      RABBITMQ_DEFAULT_USER: admin
+#      RABBITMQ_DEFAULT_PASS: admin
+
+volumes:
+  postgres:
+  redis-data:
+  rabbitmq-data:
