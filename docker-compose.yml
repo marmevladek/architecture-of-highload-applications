@@ -17,6 +17,17 @@ services:
       - postgres
       - redis
 
+  swipe-service:
+    build:
+      context: swipe-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./swipe-service/.env
+    depends_on:
+      - postgres
+
   postgres:
     container_name: postgresql
     image: postgres:17.2
@@ -27,7 +38,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: profiles_db
+      POSTGRES_DB: profiles_db, swipes_db
 
   # Redis
   redis:
