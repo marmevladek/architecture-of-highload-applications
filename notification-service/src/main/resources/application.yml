@@ -14,3 +14,9 @@ spring:
     listener:
       simple:
         message-converter: jackson2JsonMessageConverter
+
+logging:
+  file:
+    name: application.log
+  level:
+    root: info

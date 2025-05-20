@@ -25,3 +25,9 @@ deck-service:
   url: http://deck-service:8082
 profile-service:
   url: http://profile-service:8080
+
+logging:
+  file:
+    name: application.log
+  level:
+    root: info

@@ -11,3 +11,9 @@ spring:
     redis:
       host: redis
       port: 6379
+
+logging:
+  file:
+    name: application.log
+  level:
+    root: info
