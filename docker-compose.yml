@@ -25,8 +25,37 @@ services:
       - "8081:8081"
     env_file:
       - ./swipe-service/.env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=admin
     depends_on:
       - postgres
+
+  deck-service:
+    build:
+      context: deck-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    env_file:
+      - ./deck-service/.env
+    depends_on:
+      - profile-service
+
+  notification-service:
+    build:
+      context: notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    env_file:
+      - ./notification-service/.env
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+      - swipe-service
 
   postgres:
     container_name: postgresql
@@ -40,23 +69,21 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: profiles_db, swipes_db
 
-  # Redis
   redis:
     image: redis:7
+    container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis-data:/data
 
-#  # RabbitMQ
-#  rabbitmq:
-#    image: rabbitmq:3-management
-#    ports:
-#      - "5672:5672"
-#      - "15672:15672"
-#    environment:
-#      RABBITMQ_DEFAULT_USER: admin
-#      RABBITMQ_DEFAULT_PASS: admin
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
 
 volumes:
   postgres:

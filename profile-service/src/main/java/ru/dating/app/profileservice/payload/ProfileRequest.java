@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,4 +18,9 @@ public class ProfileRequest {
     private int age;
 
     private String photoUrl;
+
+    private Long chatId;
+
+    private String telegramLink;
+
 }

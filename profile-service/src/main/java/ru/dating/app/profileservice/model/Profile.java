@@ -27,9 +27,16 @@ public class Profile {
     @Column(name = "photo_url")
     private String photoUrl;
 
-    public Profile(String name, int age, String photoUrl) {
+    @Column(name = "chat_id")
+    private Long chatId;
+
+    private String telegramLink;
+
+    public Profile(String name, int age, String photoUrl, Long chatId, String telegramLink) {
         this.name = name;
         this.age = age;
         this.photoUrl = photoUrl;
+        this.chatId = chatId;
+        this.telegramLink = telegramLink;
     }
 }

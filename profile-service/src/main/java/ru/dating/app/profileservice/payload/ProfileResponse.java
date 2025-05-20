@@ -1,6 +1,5 @@
 package ru.dating.app.profileservice.payload;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,10 +22,16 @@ public class ProfileResponse implements Serializable {
 
     private String photoUrl;
 
-    public ProfileResponse(UUID id, String name, int age, String photoUrl) {
+    private Long chatId;
+
+    private String telegramLink;
+
+    public ProfileResponse(UUID id, String name, int age, String photoUrl, Long chatId, String telegramLink) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.photoUrl = photoUrl;
+        this.chatId = chatId;
+        this.telegramLink = telegramLink;
     }
 }

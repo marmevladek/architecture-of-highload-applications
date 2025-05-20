@@ -9,10 +9,8 @@ public class SwipeMapper {
 
     public static Swipe mapToSwipe(SwipeRequest swipeRequest) {
         return new Swipe(
-                swipeRequest.getUserId(),
-                swipeRequest.getTargetId(),
-                swipeRequest.getDirection(),
-                LocalDateTime.now()
+                swipeRequest.getSwiperId(),
+                swipeRequest.getTargetId()
         );
     }
 }

@@ -10,7 +10,9 @@ public class ProfileMapper {
         return new Profile(
                 profileRequest.getName(),
                 profileRequest.getAge(),
-                profileRequest.getPhotoUrl()
+                profileRequest.getPhotoUrl(),
+                profileRequest.getChatId(),
+                profileRequest.getTelegramLink()
         );
     }
 
@@ -19,7 +21,9 @@ public class ProfileMapper {
                 profile.getId(),
                 profile.getName(),
                 profile.getAge(),
-                profile.getPhotoUrl()
+                profile.getPhotoUrl(),
+                profile.getChatId(),
+                profile.getTelegramLink()
         );
     }
 }

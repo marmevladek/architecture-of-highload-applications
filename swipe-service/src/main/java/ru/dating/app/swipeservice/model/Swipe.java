@@ -20,21 +20,22 @@ public class Swipe {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @Column(name = "swiper_id")
+    private UUID swiperId;
 
     @Column(name = "target_id")
     private UUID targetId;
 
     @Enumerated(EnumType.STRING)
-    private SwipeDirection direction;
+    @Column(name = "direction_1")
+    private SwipeDirection direction1;
 
-    private LocalDateTime timestamp;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "direction_2")
+    private SwipeDirection direction2;
 
-    public Swipe(UUID userId, UUID targetId, SwipeDirection direction, LocalDateTime timestamp) {
-        this.userId = userId;
+    public Swipe(UUID userId, UUID targetId) {
+        this.swiperId = userId;
         this.targetId = targetId;
-        this.direction = direction;
-        this.timestamp = timestamp;
     }
 }

@@ -7,6 +7,7 @@ import ru.dating.app.profileservice.payload.ProfileRequest;
 import ru.dating.app.profileservice.payload.ProfileResponse;
 import ru.dating.app.profileservice.service.ProfileService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,5 +25,18 @@ public class ProfileController {
     @PostMapping("/create")
     public ResponseEntity<ProfileResponse> createProfile(@RequestBody ProfileRequest profileRequest) {
         return ResponseEntity.ok(profileService.updateProfile(profileRequest));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProfileResponse>> getProfiles(
+            @RequestParam UUID excludeUserId,
+            @RequestParam(defaultValue = "100") int limit
+    ) {
+        return ResponseEntity.ok(profileService.findAllExcludeUserId(excludeUserId, limit));
+    }
+
+    @GetMapping("/allProfiles")
+    public ResponseEntity<List<ProfileResponse>> getAllProfiles() {
+        return ResponseEntity.ok(profileService.getAllProfiles());
     }
 }

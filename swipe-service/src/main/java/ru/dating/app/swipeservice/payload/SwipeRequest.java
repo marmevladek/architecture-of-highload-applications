@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SwipeRequest {
-    private UUID userId;
+    private UUID swiperId;
     private UUID targetId;
     private SwipeDirection direction;
 }

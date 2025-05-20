@@ -9,8 +9,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#  rabbitmq:
-#    host: rabbitmq
-#    port: 5672
-#    username: guest
-#    password: guest
+  cache:
+    type: redis
+  data:
+    redis:
+      host: redis
+      port: 6379
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin
+
+deck-service:
+  url: http://deck-service:8082
+profile-service:
+  url: http://profile-service:8080
