@@ -25,4 +25,12 @@ public class ProfileResponse {
 
     private String telegramLink;
 
+    public ProfileResponse(UUID id, String name, int age, String photoUrl, Long chatId, String telegramLink) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.photoUrl = photoUrl;
+        this.chatId = chatId;
+        this.telegramLink = telegramLink;
+    }
 }
