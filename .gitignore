@@ -41,3 +41,5 @@ surefire-reports/
 
 .jrebel/
 rebel.xml
+
+docker-volumes/elasticsearch/data/*
