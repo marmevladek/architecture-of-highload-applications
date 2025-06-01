@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" dumptraffic="false">
+    <clients>
+        <client host="localhost" maxusers="5000" use_controller_vm="true"/>
+    </clients>
+
+    <servers>
+        <server host="swipe-service" port="1001" type="tcp"/>
+    </servers>
+
+    <load duration="5" unit="minute">
+        <arrivalphase phase="1" duration="1" unit="minute">
+            <users arrivalrate="1000" unit="second" maxnumber="3000"/>
+        </arrivalphase>
+    </load>
+
+    <options>
+        <option name="file_server" id="swipes_data" value="/tsung/config/swipes.csv"/>
+    </options>
+
+    <sessions>
+        <session name="swipe_session" probability="100" type="ts_http">
+            <setdynvars sourcetype="file" fileid="swipes_data" delimiter="," order="iter">
+                <var name="swiperId"/>
+                <var name="targetId"/>
+                <var name="direction"/>
+            </setdynvars>
+
+            <request subst="true">
+                <http url="http://swipe-service:1001/api/swipes"
+                      method="POST"
+                      version="1.1"
+                      content_type="application/json"
+                      contents='{
+                          "swiperId": "%%_swiperId%%",
+                          "targetId": "%%_targetId%%",
+                          "direction": "%%_direction%%"
+                      }'/>
+            </request>
+
+            <thinktime value="0.1"/>
+        </session>
+    </sessions>
+</tsung>
