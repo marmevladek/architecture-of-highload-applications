@@ -42,5 +42,5 @@ surefire-reports/
 .jrebel/
 rebel.xml
 
-tsung/log/
+infrastructure-services/tsung/tests/
 docker-volumes/elasticsearch/data/*
