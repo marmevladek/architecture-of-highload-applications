@@ -13,22 +13,27 @@ rule_files:
 scrape_configs:
   - job_name: deck-service
     metrics_path: /actuator/prometheus
-    static_configs: [{ targets: ["deck-service:8082"] }]
+    static_configs: [{ targets: ["deck-service:1002"] }]
 
   - job_name: notification-service
     metrics_path: /actuator/prometheus
-    static_configs: [{ targets: ["notification-service:8083"] }]
+    static_configs: [{ targets: ["notification-service:1003"] }]
 
   - job_name: profile-service
     metrics_path: /actuator/prometheus
-    static_configs: [{ targets: ["profile-service:8080"] }]
+    static_configs: [{ targets: ["profile-service:1000"] }]
 
   - job_name: swipe-service
     metrics_path: /actuator/prometheus
-    static_configs: [{ targets: ["swipe-service:8081"] }]
-
-  - job_name: nodeexporter
-    static_configs: [ { targets: [ "nodeexporter:9100" ] } ]
+    static_configs: [{ targets: ["swipe-service:1001"] }]
 
   - job_name: cadvisor
-    static_configs: [ { targets: [ "cadvisor:8090" ] } ]
+    static_configs: [ { targets: [ "cadvisor:8080" ] } ]
+
+  - job_name: postgres-exporter
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
