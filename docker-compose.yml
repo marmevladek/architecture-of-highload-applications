@@ -7,7 +7,7 @@ services:
       context: profile-service
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "1000:1000"
     env_file:
       - ./profile-service/.env
     environment:
@@ -15,14 +15,14 @@ services:
     depends_on:
       - postgres
       - redis
-      - logstash
+#      - logstash
 
   swipe-service:
     build:
       context: swipe-service
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "1001:1001"
     env_file:
       - ./swipe-service/.env
     environment:
@@ -31,26 +31,26 @@ services:
       - RABBITMQ_PASS=admin
     depends_on:
       - postgres
-      - logstash
+#      - logstash
 
   deck-service:
     build:
       context: deck-service
       dockerfile: Dockerfile
     ports:
-      - "8082:8082"
+      - "1002:1002"
     env_file:
       - ./deck-service/.env
     depends_on:
       - profile-service
-      - logstash
+#      - logstash
 
   notification-service:
     build:
       context: notification-service
       dockerfile: Dockerfile
     ports:
-      - "8083:8083"
+      - "1003:1003"
     env_file:
       - ./notification-service/.env
     environment:
@@ -58,7 +58,7 @@ services:
     depends_on:
       - rabbitmq
       - swipe-service
-      - logstash
+#      - logstash
 
   postgres:
     container_name: postgresql
@@ -88,102 +88,105 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
 
-  elasticsearch:
-    image: elasticsearch:7.16.1
-    volumes:
-      - ./infrastructure-services/elasticsearch/config.yaml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-      - ./docker-volumes/elasticsearch/data:/usr/share/elasticsearch/data
-    environment:
-      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
-      ELASTIC_USERNAME: "elastic"
-      ELASTIC_PASSWORD: "MyPw123"
-      discovery.type: single-node
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-
-  logstash:
-    image: logstash:7.16.1
-    volumes:
-      - ./infrastructure-services/logstash/config.yaml:/usr/share/logstash/config/logstash.yml:ro
-      - ./infrastructure-services/logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./infrastructure-services/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
-    environment:
-      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
-    ports:
-      - "5044:5044"
-      #      - "5000:5000"
-      - "9600:9600"
-    depends_on:
-      - elasticsearch
-
-  kibana:
-    image: kibana:7.16.1
-    depends_on:
-      - elasticsearch
-    volumes:
-      - ./infrastructure-services/kibana/config.yaml:/usr/share/kibana/config/kibana.yml:ro
-    ports:
-      - "5601:5601"
-
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./infrastructure-services/grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./infrastructure-services/grafana/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-
-
-  alert-manager:
-    image: prom/alertmanager:v0.27.0
-    volumes:
-      - ./infrastructure-services/alert-manager/alert-manager.yml:/etc/alertmanager/alertmanager.yml:ro
-    ports:
-      - "9093:9093"
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:10.4.3
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    volumes:
-      - grafana-data:/var/lib/grafana
-    restart: unless-stopped
-
-  nodeexporter:
-    image: prom/node-exporter:v1.8.1
-    restart: unless-stopped
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    command: -docker_only
-    restart: unless-stopped
-    ports:
-      - "8090:8090"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /:/rootfs:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-
-  tsung:
-    container_name: tsung
-    build:
-      context: ./tsung
-      dockerfile: Dockerfile
-    image: tsung:latest
-    ports:
-      - ${TSUNG_OUTER_PORT:-8091}:${TSUNG_INNER_PORT:-8091}
-    volumes:
-      - ./tsung/config:/tsung/config
-      - ./tsung/log:/root/.tsung/log
-    entrypoint: [ "sleep", "infinity" ]
+#  elasticsearch:
+#    image: elasticsearch:7.16.1
+#    volumes:
+#      - ./infrastructure-services/elasticsearch/config.yaml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+#      - ./docker-volumes/elasticsearch/data:/usr/share/elasticsearch/data
+#    environment:
+#      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+#      ELASTIC_USERNAME: "elastic"
+#      ELASTIC_PASSWORD: "MyPw123"
+#      discovery.type: single-node
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+#
+#  logstash:
+#    image: logstash:7.16.1
+#    volumes:
+#      - ./infrastructure-services/logstash/config.yaml:/usr/share/logstash/config/logstash.yml:ro
+#      - ./infrastructure-services/logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yml:ro
+#      - ./infrastructure-services/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
+#    environment:
+#      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+#    ports:
+#      - "5044:5044"
+#      #      - "5000:5000"
+#      - "9600:9600"
+#    depends_on:
+#      - elasticsearch
+#
+#  kibana:
+#    image: kibana:7.16.1
+#    depends_on:
+#      - elasticsearch
+#    volumes:
+#      - ./infrastructure-services/kibana/config.yaml:/usr/share/kibana/config/kibana.yml:ro
+#    ports:
+#      - "5601:5601"
+#
+#  prometheus:
+#    image: prom/prometheus
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./infrastructure-services/grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#      - ./infrastructure-services/grafana/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+#    command:
+#      - "--config.file=/etc/prometheus/prometheus.yml"
+#
+#
+#  alert-manager:
+#    image: prom/alertmanager:v0.27.0
+#    volumes:
+#      - ./infrastructure-services/alert-manager/alert-manager.yml:/etc/alertmanager/alertmanager.yml:ro
+#    ports:
+#      - "9093:9093"
+#    restart: unless-stopped
+#
+#  grafana:
+#    image: grafana/grafana:10.4.3
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      GF_SECURITY_ADMIN_USER: admin
+#      GF_SECURITY_ADMIN_PASSWORD: admin
+#    volumes:
+#      - grafana-data:/var/lib/grafana
+#    depends_on:
+#      - prometheus
+#
+#  cadvisor:
+#    image: gcr.io/cadvisor/cadvisor:v0.47.2
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - /:/rootfs:ro
+#      - /var/run:/var/run:ro
+#      - /sys:/sys:ro
+#      - /var/lib/docker/:/var/lib/docker:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#
+#  postgres-exporter:
+#    image: prometheuscommunity/postgres-exporter
+#    environment:
+#      DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgres:5432/devopsl-db?sslmode=disable"
+#    ports:
+#      - "9187:9187"
+#
+#  tsung:
+#    container_name: tsung
+#    build:
+#      context: infrastructure-services/tsung
+#      dockerfile: Dockerfile
+#    image: tsung:latest
+#    ports:
+#      - ${TSUNG_OUTER_PORT:-8091}:${TSUNG_INNER_PORT:-8091}
+#    volumes:
+#      - ./infrastructure-services/tsung/:/tsung/config
+#      - ./infrastructure-services/tsung/log:/root/.tsung/log
+#    entrypoint: [ "sleep", "infinity" ]
 
 volumes:
   postgres:
