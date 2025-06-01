@@ -1,0 +1,37 @@
+<?xml version="1.0"?><tsung loglevel="notice" dumptraffic="false">
+    <clients>
+        <client host="localhost" maxusers="20000" use_controller_vm="true"/>
+    </clients>
+
+    <servers>
+        <server host="swipe-service" port="1001" type="tcp"/>
+    </servers>
+
+    <load duration="10" unit="minute">
+        <arrivalphase phase="1" duration="2" unit="minute">
+            <users arrivalrate="800" unit="second" maxnumber="15000"/>
+        </arrivalphase>
+        <arrivalphase phase="2" duration="3" unit="minute">
+            <users arrivalrate="1200" unit="second" maxnumber="20000"/>
+        </arrivalphase>
+    </load>
+    <options>
+        <option name="file_server" id="swipes_data" value="/tsung/config/swipes.csv"/>
+    </options>
+
+    <sessions>
+        <session name="swipe_session" probability="100" type="ts_http">
+            <setdynvars sourcetype="file" fileid="swipes_data" delimiter="," order="iter">
+                <var name="swiperId"/>
+                <var name="targetId"/>
+                <var name="direction"/>
+            </setdynvars>
+
+            <request subst="true">
+                <http url="http://swipe-service:1001/api/swipes" method="POST" version="1.1" content_type="application/json" contents="{                           &quot;swiperId&quot;: &quot;%%_swiperId%%&quot;,                           &quot;targetId&quot;: &quot;%%_targetId%%&quot;,                           &quot;direction&quot;: &quot;%%_direction%%&quot;                       }"/>
+            </request>
+
+            <thinktime value="0.5"/>
+        </session>
+    </sessions>
+</tsung>
