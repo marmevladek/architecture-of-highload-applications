@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 1001
 
 spring:
   datasource:
@@ -22,31 +22,31 @@ spring:
     password: admin
 
 deck-service:
-  url: http://deck-service:8082
+  url: http://deck-service:1002
 profile-service:
-  url: http://profile-service:8080
+  url: http://profile-service:1000
 
-logging:
-  file:
-    name: application.log
-  level:
-    root: info
+#logging:
+#  file:
+#    name: application.log
+#  level:
+#    root: info
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus,info
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  metrics:
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
-  endpoint:
-    prometheus:
-      enabled: true
-  server:
-    port: 8081
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: prometheus,health,info
+#  prometheus:
+#    metrics:
+#      export:
+#        enabled: true
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        "[http.server.requests]": true
+#  endpoint:
+#    prometheus:
+#      enabled: true
+#  server:
+#    port: 1001

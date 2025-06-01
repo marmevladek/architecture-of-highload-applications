@@ -1,8 +1,8 @@
 server:
-  port: 8082
+  port: 1002
 
 profile-service:
-  url: http://profile-service:8080
+  url: http://profile-service:1000
 
 spring:
   cache:
@@ -12,27 +12,27 @@ spring:
       host: redis
       port: 6379
 
-logging:
-  file:
-    name: application.log
-  level:
-    root: info
+#logging:
+#  file:
+#    name: application.log
+#  level:
+#    root: info
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus,info
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  metrics:
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
-  endpoint:
-    prometheus:
-      enabled: true
-  server:
-    port: 8082
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,prometheus,info
+#  prometheus:
+#    metrics:
+#      export:
+#        enabled: true
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        "[http.server.requests]": true
+#  endpoint:
+#    prometheus:
+#      enabled: true
+#  server:
+#    port: 1002

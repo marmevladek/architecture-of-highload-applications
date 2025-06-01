@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 1003
 
 telegram:
   bot:
@@ -15,27 +15,27 @@ spring:
       simple:
         message-converter: jackson2JsonMessageConverter
 
-logging:
-  file:
-    name: application.log
-  level:
-    root: info
+#logging:
+#  file:
+#    name: application.log
+#  level:
+#    root: info
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus,info
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  metrics:
-    distribution:
-      percentiles-histogram:
-        "[http.server.requests]": true
-  endpoint:
-    prometheus:
-      enabled: true
-  server:
-    port: 8083
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,prometheus,info
+#  prometheus:
+#    metrics:
+#      export:
+#        enabled: true
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        "[http.server.requests]": true
+#  endpoint:
+#    prometheus:
+#      enabled: true
+#  server:
+#    port: 1003
