@@ -2,9 +2,11 @@ package ru.dating.app.swipeservice.service.impl;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dating.app.swipeservice.dto.CoincidenceDTO;
+import ru.dating.app.swipeservice.exception.TargetNotFoundException;
 import ru.dating.app.swipeservice.external.client.DeckServiceClient;
 import ru.dating.app.swipeservice.external.client.ProfileServiceClient;
 import ru.dating.app.swipeservice.mapper.SwipeMapper;
@@ -47,71 +49,77 @@ public class SwipeServiceImpl implements SwipeService {
             deck = deckServiceClient.getDeck(swipeRequest.getSwiperId());
         }
 
-        UUID swiperId = swipeRequest.getSwiperId();
-        UUID targetId = swipeRequest.getTargetId();
+        boolean targetInDeck = deck.stream()
+                .anyMatch(profile -> profile.getId().equals(swipeRequest.getTargetId()));
 
-        Swipe savedSwipe;
+        if (targetInDeck) {
+            UUID swiperId = swipeRequest.getSwiperId();
+            UUID targetId = swipeRequest.getTargetId();
 
-        Optional<Swipe> existing = swipeRepository.findSwipeBySwiperIdAndTargetId(targetId, swiperId);
+            Swipe savedSwipe;
 
-        if (existing.isPresent()) {
+            Optional<Swipe> existing = swipeRepository.findSwipeBySwiperIdAndTargetId(targetId, swiperId);
 
-            Swipe swipe = existing.get();
-            swipe.setDirection2(swipeRequest.getDirection());
-            savedSwipe = swipeRepository.save(swipe);
+            if (existing.isPresent()) {
 
-            if (isCoincidence(savedSwipe)) {
+                Swipe swipe = existing.get();
+                swipe.setDirection2(swipeRequest.getDirection());
+                savedSwipe = swipeRepository.save(swipe);
 
-                ProfileResponse swiperProfile = null;
-                ProfileResponse targetProfile = null;
+                if (isCoincidence(savedSwipe)) {
 
-                for (ProfileResponse profile : deck) {
-                    if (profile.getId().equals(targetId)) targetProfile = profile;
+                    ProfileResponse swiperProfile = null;
+                    ProfileResponse targetProfile = null;
+
+                    for (ProfileResponse profile : deck) {
+                        if (profile.getId().equals(targetId)) targetProfile = profile;
+                    }
+
+                    swiperProfile = profileServiceClient.getProfileById(swiperId);
+
+
+                    if (swiperProfile != null && targetProfile != null) {
+
+                        rabbitTemplate.convertAndSend(
+                                "match-exchange",
+                                "match-exchange.coincidence",
+                                new CoincidenceDTO(
+                                        targetId,
+                                        targetProfile.getName(),
+                                        targetProfile.getAge(),
+                                        swiperProfile.getChatId(),
+                                        targetProfile.getTelegramLink())
+                        );
+
+                        rabbitTemplate.convertAndSend(
+                                "match-exchange",
+                                "match-exchange.coincidence",
+                                new CoincidenceDTO(
+                                        swiperId,
+                                        swiperProfile.getName(),
+                                        swiperProfile.getAge(),
+                                        targetProfile.getChatId(),
+                                        swiperProfile.getTelegramLink()
+                                )
+                        );
+
+                    }
                 }
 
-                swiperProfile = profileServiceClient.getProfileById(swiperId);
 
-
-                if (swiperProfile != null && targetProfile != null) {
-
-                    rabbitTemplate.convertAndSend(
-                            "match-exchange",
-                            "match-exchange.coincidence",
-                            new CoincidenceDTO(
-                                    targetId,
-                                    targetProfile.getName(),
-                                    targetProfile.getAge(),
-                                    swiperProfile.getChatId(),
-                                    targetProfile.getTelegramLink())
-                            );
-
-                    rabbitTemplate.convertAndSend(
-                            "match-exchange",
-                            "match-exchange.coincidence",
-                            new CoincidenceDTO(
-                                    swiperId,
-                                    swiperProfile.getName(),
-                                    swiperProfile.getAge(),
-                                    targetProfile.getChatId(),
-                                    swiperProfile.getTelegramLink()
-                            )
-                    );
-
-                }
+            } else {
+                Swipe swipe = SwipeMapper.mapToSwipe(swipeRequest);
+                swipe.setDirection1(swipeRequest.getDirection());
+                savedSwipe = swipeRepository.save(swipe);
             }
+            List<ProfileResponse> updatedDeck = deck.stream()
+                    .filter(profileResponse -> !profileResponse.getId().equals(savedSwipe.getTargetId()))
+                    .toList();
 
-
+            redisTemplate.opsForValue().set(swiperId.toString(), updatedDeck);
         } else {
-            Swipe swipe = SwipeMapper.mapToSwipe(swipeRequest);
-            swipe.setDirection1(swipeRequest.getDirection());
-            savedSwipe = swipeRepository.save(swipe);
+            throw new TargetNotFoundException("Target user not found", "NOT_FOUND", 404);
         }
-        List<ProfileResponse> updatedDeck = deck.stream()
-                .filter(profileResponse -> !profileResponse.getId().equals(savedSwipe.getTargetId()))
-                .toList();
-
-        redisTemplate.opsForValue().set(swiperId.toString(), updatedDeck);
-
     }
 
     @Transactional(readOnly = true)
