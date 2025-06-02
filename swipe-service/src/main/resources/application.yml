@@ -1,11 +1,23 @@
 server:
   port: 1001
 
+app:
+  datasource:
+    master:
+      url: ${APP_DATASOURCE_MASTER_URL}
+      username: ${APP_DATASOURCE_MASTER_USERNAME}
+      password: ${APP_DATASOURCE_MASTER_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+    replica:
+      url: ${APP_DATASOURCE_REPLICA_URL}
+      username: ${APP_DATASOURCE_REPLICA_USERNAME}
+      password: ${APP_DATASOURCE_REPLICA_PASSWORD}}
+      driver-class-name: org.postgresql.Driver
+
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 100
   jpa:
     hibernate:
       ddl-auto: update
