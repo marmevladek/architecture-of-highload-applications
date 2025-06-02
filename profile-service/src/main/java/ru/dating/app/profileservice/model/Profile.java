@@ -30,6 +30,7 @@ public class Profile {
     @Column(name = "chat_id")
     private Long chatId;
 
+    @Column(name = "telegram_link")
     private String telegramLink;
 
     public Profile(String name, int age, String photoUrl, Long chatId, String telegramLink) {

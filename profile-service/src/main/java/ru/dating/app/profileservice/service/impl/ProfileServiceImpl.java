@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.dating.app.profileservice.mapper.ProfileMapper;
 import ru.dating.app.profileservice.model.Profile;
 import ru.dating.app.profileservice.payload.ProfileRequest;
@@ -31,18 +32,21 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Cacheable(key = "#id")
+    @Transactional(readOnly = true)
     @Override
     public ProfileResponse getProfileById(UUID id) {
         return ProfileMapper.mapToProfileResponse(profileRepository.findById(id).orElseThrow());
     }
 
     @CachePut(key = "#result.id")
+    @Transactional
     @Override
     public ProfileResponse updateProfile(ProfileRequest profileRequest) {
         Profile savedProfile = profileRepository.save(ProfileMapper.mapToProfile(profileRequest));
         return ProfileMapper.mapToProfileResponse(savedProfile);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ProfileResponse> findAllExcludeUserId(UUID excludeUserId, int limit) {
         return profileRepository.findAllExcludeUserId(excludeUserId, limit).stream()
@@ -50,6 +54,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ProfileResponse> getAllProfiles() {
         return profileRepository.findAll().stream()
