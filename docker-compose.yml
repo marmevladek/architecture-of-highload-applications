@@ -3,12 +3,16 @@ version: '3.8'
 services:
 
   profile-service:
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
     image: profile-service:latest
     deploy:
+      replicas: 2
       resources:
         limits:
           cpus: '1'
-          memory: 512M
+          memory: 256M
     ports:
       - "1000:1000"
     env_file:
@@ -16,14 +20,17 @@ services:
     environment:
       SPRING_REDIS_HOST: redis
     depends_on:
-      - postgres
+      - postgres-master-profile
       - redis
 #      - logstash
 
   swipe-service:
+    build:
+      context: ./swipe-service
+      dockerfile: Dockerfile
     image: swipe-service:latest
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '2'
@@ -37,15 +44,19 @@ services:
       - RABBITMQ_USER=admin
       - RABBITMQ_PASS=admin
     depends_on:
-      - postgres
+      - postgres-master-swipe
 #      - logstash
 
   deck-service:
+    build:
+      context: ./deck-service
+      dockerfile: Dockerfile
     image: deck-service:latest
     deploy:
+      replicas: 2
       resources:
         limits:
-          cpus: '0.5'
+          cpus: '0.50'
           memory: 512M
     ports:
       - "1002:1002"
@@ -56,8 +67,12 @@ services:
 #      - logstash
 
   notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
     image: notification-service:latest
     deploy:
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
