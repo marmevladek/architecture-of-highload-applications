@@ -44,21 +44,21 @@ profile-service:
 #  level:
 #    root: info
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: prometheus,health,info
-#  prometheus:
-#    metrics:
-#      export:
-#        enabled: true
-#  metrics:
-#    distribution:
-#      percentiles-histogram:
-#        "[http.server.requests]": true
-#  endpoint:
-#    prometheus:
-#      enabled: true
-#  server:
-#    port: 1001
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  endpoint:
+    prometheus:
+      enabled: true
+  server:
+    port: 1001
