@@ -66,6 +66,7 @@ jobs:
         working-directory: profile-service
 
   image-profile-service:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Image Profile Service
     needs: test-profile-service
@@ -149,6 +150,7 @@ jobs:
         working-directory: swipe-service
 
   image-swipe-service:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Image Swipe Service
     needs: test-swipe-service
@@ -231,6 +233,7 @@ jobs:
         working-directory: deck-service
 
   image-deck-service:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Image Deck Service
     needs: test-deck-service
@@ -287,6 +290,7 @@ jobs:
         working-directory: notification-service
 
   image-notification-service:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Image Notification Service
     needs: build-notification-service
@@ -318,6 +322,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
   image-tsung:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Image Tsung
 
