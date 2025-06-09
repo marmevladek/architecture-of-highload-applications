@@ -1,5 +1,4 @@
-name: ci.yml
-
+name: CI
 
 on:
   push:
@@ -69,6 +68,7 @@ jobs:
   image-profile-service:
     runs-on: ubuntu-latest
     name: Image Profile Service
+    needs: test-profile-service
 
     permissions:
       contents: read
@@ -151,7 +151,7 @@ jobs:
   image-swipe-service:
     runs-on: ubuntu-latest
     name: Image Swipe Service
-
+    needs: test-swipe-service
     permissions:
       contents: read
       packages: write
@@ -233,7 +233,7 @@ jobs:
   image-deck-service:
     runs-on: ubuntu-latest
     name: Image Deck Service
-
+    needs: test-deck-service
     permissions:
       contents: read
       packages: write
@@ -289,7 +289,7 @@ jobs:
   image-notification-service:
     runs-on: ubuntu-latest
     name: Image Notification Service
-
+    needs: build-notification-service
     permissions:
       contents: read
       packages: write
