@@ -60,7 +60,7 @@ jobs:
 
   docker-image:
     name: Docker Image ${{ matrix.service }}
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: build-and-test
 
