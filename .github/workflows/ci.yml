@@ -112,7 +112,11 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }} HEAD | grep '^infrastructure-services/tsung/' || true)
-          echo "changed=${{ !!CHANGED }}" >> $GITHUB_OUTPUT
+          if [[ -n "$CHANGED" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Stop if no changes
         if: steps.tsung_changes.outputs.changed == 'false'
