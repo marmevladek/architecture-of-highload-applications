@@ -269,11 +269,11 @@ services:
       - "9187:9187"
 
   tsung:
-#    container_name: tsung
-#    build:
-#      context: infrastructure-services/tsung
-#      dockerfile: Dockerfile
-    image: tsung:latest
+    container_name: tsung
+    build:
+      context: infrastructure-services/tsung
+      dockerfile: Dockerfile
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/tsung:latest
     ports:
       - ${TSUNG_OUTER_PORT:-8091}:${TSUNG_INNER_PORT:-8091}
     volumes:
