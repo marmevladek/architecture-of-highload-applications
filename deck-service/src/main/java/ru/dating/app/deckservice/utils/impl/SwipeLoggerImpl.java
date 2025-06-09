@@ -23,7 +23,7 @@ public class SwipeLoggerImpl implements SwipeLogger {
         try {
             if (Files.notExists(csvPath)) {
                 Files.createDirectories(csvPath.getParent());
-                Files.write(csvPath, List.of("swiper_id,target_id,direction"), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                Files.createFile(csvPath);
             }
             String line = swiperId + "," + targetId + "," + direction;
             Files.write(csvPath, List.of(line), StandardOpenOption.APPEND);
