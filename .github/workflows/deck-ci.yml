@@ -93,3 +93,4 @@ jobs:
           file: ./deck-service/Dockerfile
           push: true
           tags: ghcr.io/marmevladek/architecture-of-highload-applications/deck-service:latest
+          platforms: linux/amd64,linux/arm64
