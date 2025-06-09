@@ -6,7 +6,7 @@ services:
     build:
       context: ./profile-service
       dockerfile: Dockerfile
-    image: profile-service:latest
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/profile-service:latest
     deploy:
       replicas: 2
       resources:
@@ -28,7 +28,7 @@ services:
     build:
       context: ./swipe-service
       dockerfile: Dockerfile
-    image: swipe-service:latest
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/swipe-service:latest
     deploy:
       replicas: 3
       resources:
@@ -51,7 +51,7 @@ services:
     build:
       context: ./deck-service
       dockerfile: Dockerfile
-    image: deck-service:latest
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/deck-service:latest
     deploy:
       replicas: 2
       resources:
@@ -70,7 +70,7 @@ services:
     build:
       context: ./notification-service
       dockerfile: Dockerfile
-    image: notification-service:latest
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/notification-service:latest
     deploy:
       replicas: 2
       resources:
