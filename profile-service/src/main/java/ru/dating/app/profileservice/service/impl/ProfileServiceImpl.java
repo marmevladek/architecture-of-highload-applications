@@ -1,10 +1,8 @@
 package ru.dating.app.profileservice.service.impl;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dating.app.profileservice.mapper.ProfileMapper;
@@ -23,11 +21,9 @@ import java.util.stream.Collectors;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
-    private final RabbitTemplate rabbitTemplate;
 
-    public ProfileServiceImpl(ProfileRepository profileRepository, RabbitTemplate rabbitTemplate) {
+    public ProfileServiceImpl(ProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
-        this.rabbitTemplate = rabbitTemplate;
     }
 
 

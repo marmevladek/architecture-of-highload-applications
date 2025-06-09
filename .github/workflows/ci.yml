@@ -24,13 +24,45 @@ env:
   JAVA_DISTRIBUTION: 'temurin'
 
 jobs:
+  changed-services:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine changed services
+        id: set-matrix
+        run: |
+          git fetch origin ${{ github.base_ref || 'main' }}
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref || 'main' }} HEAD)
+
+          SERVICES=()
+          for SERVICE in profile-service swipe-service deck-service notification-service; do
+            if echo "$CHANGED" | grep "^$SERVICE/" > /dev/null; then
+              SERVICES+=("\"$SERVICE\"")
+            fi
+          done
+
+          if [ ${#SERVICES[@]} -eq 0 ]; then
+            echo "No services changed."
+            echo '{"include":[]}' > matrix.json
+          else
+            echo "Changed services: ${SERVICES[*]}"
+            echo "{\"include\":[$(IFS=, ; echo "${SERVICES[*]}")]}" > matrix.json
+          fi
+
+          echo "matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
+
   build-and-test:
     name: Build & Test ${{ matrix.service }}
     runs-on: ubuntu-latest
+    needs: changed-services
+    if: ${{ fromJson(needs.changed-services.outputs.matrix).include != '' }}
 
     strategy:
-      matrix:
-        service: [profile-service, swipe-service, deck-service, notification-service]
+      matrix: ${{ fromJson(needs.changed-services.outputs.matrix) }}
 
     steps:
       - name: Checkout code
@@ -62,11 +94,9 @@ jobs:
     name: Docker Image ${{ matrix.service }}
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: build-and-test
-
+    needs: [build-and-test, changed-services]
     strategy:
-      matrix:
-        service: [profile-service, swipe-service, deck-service, notification-service]
+      matrix: ${{ fromJson(needs.changed-services.outputs.matrix) }}
 
     permissions:
       contents: read
