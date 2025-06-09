@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.dating.app.deckservice.external.client.ProfileServiceClient;
 import ru.dating.app.deckservice.payload.ProfileResponse;
 import ru.dating.app.deckservice.service.DeckService;
+import ru.dating.app.deckservice.utils.SwipeLogger;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,11 +23,15 @@ import java.util.UUID;
 public class DeckServiceImpl implements DeckService {
 
     private final ProfileServiceClient profileServiceClient;
+    private final SwipeLogger swipeLogger;
     private final RedisTemplate<String, List<ProfileResponse>> redisTemplate;
 
+    private final Random random = new Random();
 
-    public DeckServiceImpl(ProfileServiceClient profileServiceClient, RedisTemplate<String, List<ProfileResponse>> redisTemplate) {
+
+    public DeckServiceImpl(ProfileServiceClient profileServiceClient, SwipeLogger swipeLogger, RedisTemplate<String, List<ProfileResponse>> redisTemplate) {
         this.profileServiceClient = profileServiceClient;
+        this.swipeLogger = swipeLogger;
         this.redisTemplate = redisTemplate;
     }
 
@@ -37,26 +42,9 @@ public class DeckServiceImpl implements DeckService {
 
         redisTemplate.opsForValue().set(userId.toString(), deck, Duration.ofHours(12));
 
-        Path csvPath = Paths.get("infrastructure-services", "tsung", "test-swipes.csv");
-
-        Random random = new Random();
-
-        try {
-            if (Files.notExists(csvPath)) {
-                Files.createFile(csvPath);
-                Files.write(csvPath, List.of("swiper_id,target_id,direction"), StandardOpenOption.APPEND);
-            }
-
-            List<String> linesToAppend = deck.stream()
-                    .map(profile -> {
-                        String direction = random.nextBoolean() ? "RIGHT" : "LEFT";
-                        return userId + "," + profile.getId() + "," + direction;
-                    })
-                    .toList();
-
-            Files.write(csvPath, linesToAppend, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Failed to write deck file.", e);
+        for (ProfileResponse profile : deck) {
+            String direction = random.nextBoolean() ? "RIGHT" : "LEFT";
+            swipeLogger.log(userId, profile.getId(), direction);
         }
 
         return deck;
