@@ -30,7 +30,7 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<List<ProfileResponse>> getProfiles(
             @RequestParam UUID excludeUserId,
-            @RequestParam(defaultValue = "250") int limit
+            @RequestParam(defaultValue = "2500") int limit
     ) {
         return ResponseEntity.ok(profileService.findAllExcludeUserId(excludeUserId, limit));
     }
