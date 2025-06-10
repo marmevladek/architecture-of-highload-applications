@@ -26,14 +26,8 @@ public class SwipeController {
     @PostMapping
     public ResponseEntity<?> registerSwipe(@RequestBody SwipeRequest swipeRequest) {
         logger.info("Swipe request: {}, {}, {}", swipeRequest.getSwiperId(), swipeRequest.getTargetId(), swipeRequest.getDirection());
-        try {
-            swipeService.processSwipe(swipeRequest);
-            return ResponseEntity.ok().build();
-        } catch (TargetNotFoundException e) {
-            return new ResponseEntity<>(new MessageResponse("Target User not found"), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new MessageResponse("Server error"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        swipeService.processSwipe(swipeRequest);
+        return ResponseEntity.ok().build();
 
     }
 
