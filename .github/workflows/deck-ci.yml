@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Deck Service
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
         run: mvn clean install -DskipTests
 
   test:
-    name: Test Deck Service
+    name: Test
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -58,7 +58,7 @@ jobs:
         run: mvn test
 
   docker-image:
-    name: Docker Image Deck Service
+    name: Docker Image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: test
