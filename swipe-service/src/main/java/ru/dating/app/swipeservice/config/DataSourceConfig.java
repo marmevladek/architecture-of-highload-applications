@@ -1,11 +1,6 @@
 package ru.dating.app.swipeservice.config;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -13,10 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -103,29 +95,5 @@ public class DataSourceConfig {
     @Bean
     public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
-    }
-
-
-    @Aspect
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    @Configuration
-    public static class DataSourceRoutingAspect {
-
-        @Pointcut("@annotation(transactional)")
-        public void transactionalMethods(org.springframework.transaction.annotation.Transactional transactional) {}
-
-        @Before("transactionalMethods(transactional) && args()")
-        public void beforeTransaction(org.aspectj.lang.JoinPoint joinPoint, org.springframework.transaction.annotation.Transactional transactional) {
-            if (transactional.readOnly()) {
-                ReplicationRoutingDataSource.setWrite(false); // чтение — реплика
-            } else {
-                ReplicationRoutingDataSource.setWrite(true);  // запись — мастер
-            }
-        }
-
-        @After("transactionalMethods(transactional)")
-        public void afterTransaction(org.aspectj.lang.JoinPoint joinPoint, org.springframework.transaction.annotation.Transactional transactional) {
-            ReplicationRoutingDataSource.clear();
-        }
     }
 }
