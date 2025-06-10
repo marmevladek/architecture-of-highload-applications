@@ -3,14 +3,12 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - '**/src/**'
-      - '**/pom.xml'
+      - 'profile-service/**'
       - '.github/workflows/profile-ci.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - '**/src/**'
-      - '**/pom.xml'
+      - 'profile-service/**'
       - '.github/workflows/profile-ci.yml'
 
 jobs:
