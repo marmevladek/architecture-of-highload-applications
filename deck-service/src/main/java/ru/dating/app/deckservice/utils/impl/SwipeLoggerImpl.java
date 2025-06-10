@@ -10,13 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
 public class SwipeLoggerImpl implements SwipeLogger {
-    private final Path csvPath = Paths.get("infrastructure-services", "tsung", "test-swipes.csv");
-    private final Random random = new Random();
+    private final Path csvPath = Paths.get("tsung", "config", "swipes.csv");
 
     @Override
     public void log(UUID swiperId, UUID targetId, String direction) {
