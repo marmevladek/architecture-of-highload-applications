@@ -45,70 +45,81 @@ public class SwipeServiceImpl implements SwipeService {
 
         List<ProfileResponse> deck  = redisTemplate.opsForValue().get(swipeRequest.getSwiperId().toString());
 
-        UUID swiperId = swipeRequest.getSwiperId();
-        UUID targetId = swipeRequest.getTargetId();
+//        if (deck == null || deck.isEmpty()) {
+//            deck = deckServiceClient.getDeck(swipeRequest.getSwiperId());
+//        }
 
-        Swipe savedSwipe;
+        boolean targetInDeck = deck.stream()
+                .anyMatch(profile -> profile.getId().equals(swipeRequest.getTargetId()));
 
-        Optional<Swipe> existing = swipeRepository.findSwipeBySwiperIdAndTargetId(targetId, swiperId);
+        if (targetInDeck) {
+            UUID swiperId = swipeRequest.getSwiperId();
+            UUID targetId = swipeRequest.getTargetId();
 
-        if (existing.isPresent()) {
+            Swipe savedSwipe;
 
-            Swipe swipe = existing.get();
-            swipe.setDirection2(swipeRequest.getDirection());
-            savedSwipe = swipeRepository.save(swipe);
+            Optional<Swipe> existing = swipeRepository.findSwipeBySwiperIdAndTargetId(targetId, swiperId);
 
-            if (isCoincidence(savedSwipe)) {
+            if (existing.isPresent()) {
 
-                ProfileResponse swiperProfile = null;
-                ProfileResponse targetProfile = null;
+                Swipe swipe = existing.get();
+                swipe.setDirection2(swipeRequest.getDirection());
+                savedSwipe = swipeRepository.save(swipe);
 
-                for (ProfileResponse profile : deck) {
-                    if (profile.getId().equals(targetId)) targetProfile = profile;
+                if (isCoincidence(savedSwipe)) {
+
+                    ProfileResponse swiperProfile = null;
+                    ProfileResponse targetProfile = null;
+
+                    for (ProfileResponse profile : deck) {
+                        if (profile.getId().equals(targetId)) targetProfile = profile;
+                    }
+
+                    swiperProfile = profileServiceClient.getProfileById(swiperId);
+
+
+                    if (swiperProfile != null && targetProfile != null) {
+
+                        rabbitTemplate.convertAndSend(
+                                "match-exchange",
+                                "match-exchange.coincidence",
+                                new CoincidenceDTO(
+                                        targetId,
+                                        targetProfile.getName(),
+                                        targetProfile.getAge(),
+                                        swiperProfile.getChatId(),
+                                        targetProfile.getTelegramLink())
+                        );
+
+                        rabbitTemplate.convertAndSend(
+                                "match-exchange",
+                                "match-exchange.coincidence",
+                                new CoincidenceDTO(
+                                        swiperId,
+                                        swiperProfile.getName(),
+                                        swiperProfile.getAge(),
+                                        targetProfile.getChatId(),
+                                        swiperProfile.getTelegramLink()
+                                )
+                        );
+
+                    }
                 }
 
-                swiperProfile = profileServiceClient.getProfileById(swiperId);
 
-
-                if (swiperProfile != null && targetProfile != null) {
-
-                    rabbitTemplate.convertAndSend(
-                            "match-exchange",
-                            "match-exchange.coincidence",
-                            new CoincidenceDTO(
-                                    targetId,
-                                    targetProfile.getName(),
-                                    targetProfile.getAge(),
-                                    swiperProfile.getChatId(),
-                                    targetProfile.getTelegramLink())
-                    );
-
-                    rabbitTemplate.convertAndSend(
-                            "match-exchange",
-                            "match-exchange.coincidence",
-                            new CoincidenceDTO(
-                                    swiperId,
-                                    swiperProfile.getName(),
-                                    swiperProfile.getAge(),
-                                    targetProfile.getChatId(),
-                                    swiperProfile.getTelegramLink()
-                            )
-                    );
-
-                }
+            } else {
+                Swipe swipe = SwipeMapper.mapToSwipe(swipeRequest);
+                swipe.setDirection1(swipeRequest.getDirection());
+                savedSwipe = swipeRepository.save(swipe);
             }
+            List<ProfileResponse> updatedDeck = deck.stream()
+                    .filter(profileResponse -> !profileResponse.getId().equals(savedSwipe.getTargetId()))
+                    .toList();
 
-
+            redisTemplate.opsForValue().set(swiperId.toString(), updatedDeck);
         } else {
-            Swipe swipe = SwipeMapper.mapToSwipe(swipeRequest);
-            swipe.setDirection1(swipeRequest.getDirection());
-            savedSwipe = swipeRepository.save(swipe);
+            throw new TargetNotFoundException("Target user not found", "NOT_FOUND", 404);
         }
-        List<ProfileResponse> updatedDeck = deck.stream()
-                .filter(profileResponse -> !profileResponse.getId().equals(savedSwipe.getTargetId()))
-                .toList();
-
-        redisTemplate.opsForValue().set(swiperId.toString(), updatedDeck);
     }
 
     @Transactional(readOnly = true)
