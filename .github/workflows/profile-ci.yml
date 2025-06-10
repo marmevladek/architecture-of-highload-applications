@@ -5,11 +5,6 @@ on:
     paths:
       - 'profile-service/**'
       - '.github/workflows/profile-ci.yml'
-  pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'profile-service/**'
-      - '.github/workflows/profile-ci.yml'
 
 jobs:
   build:
