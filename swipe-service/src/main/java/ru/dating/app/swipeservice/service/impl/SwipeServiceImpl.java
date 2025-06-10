@@ -45,9 +45,9 @@ public class SwipeServiceImpl implements SwipeService {
 
         List<ProfileResponse> deck  = redisTemplate.opsForValue().get(swipeRequest.getSwiperId().toString());
 
-        if (deck == null || deck.isEmpty()) {
-            deck = deckServiceClient.getDeck(swipeRequest.getSwiperId());
-        }
+//        if (deck == null || deck.isEmpty()) {
+//            deck = deckServiceClient.getDeck(swipeRequest.getSwiperId());
+//        }
 
         boolean targetInDeck = deck.stream()
                 .anyMatch(profile -> profile.getId().equals(swipeRequest.getTargetId()));
