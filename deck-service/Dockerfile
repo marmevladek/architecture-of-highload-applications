@@ -1,16 +1,16 @@
-FROM maven:3.9.8 AS builder
-WORKDIR /app
-COPY . .
-RUN mvn clean formatter:format install
-
 FROM openjdk:21
-WORKDIR /app
 
-COPY --from=builder /app/target/deck-service-1.0-SNAPSHOT.jar app.jar
+WORKDIR /
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN mkdir -p $HOME/maven3 && cd $HOME/maven3
+FROM maven:3.9.8 AS maven
+ENV M2_HOME=$HOME/maven3
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY  . /
+RUN mvn clean formatter:format install
+RUN mv ./target/deck-service-1.0-SNAPSHOT.jar app.jar
+
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
 EXPOSE 1002
