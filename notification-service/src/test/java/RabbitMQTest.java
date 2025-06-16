@@ -7,7 +7,7 @@ import ru.dating.app.notificationservice.service.TelegramBotService;
 
 import static org.mockito.Mockito.*;
 
-class RabbitMQListenerTest {
+class RabbitMQTest {
 
     private TelegramBotService telegramBotService;
     private RabbitMQListener rabbitMQListener;
@@ -20,16 +20,13 @@ class RabbitMQListenerTest {
 
     @Test
     void handleMatch_shouldCallSendNotification() {
-        // given
         CoincidenceDTO dto = new CoincidenceDTO();
         dto.setSwiperChatId(123456789L);
         dto.setTargetName("Аня");
         dto.setTargetTelegramLink("https://t.me/anya");
 
-        // when
         rabbitMQListener.handleMatch(dto);
 
-        // then
         verify(telegramBotService, times(1)).sendNotification(dto);
     }
 }
