@@ -13,11 +13,6 @@ services:
       - ./profile-service/.env
     environment:
       SPRING_REDIS_HOST: redis
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:1000/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
     depends_on:
       - postgres-master-profile
       - redis
@@ -29,11 +24,11 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/marmevladek/architecture-of-highload-applications/swipe-service:latest
     deploy:
-#      replicas: 2
+      replicas: 2
       resources:
         limits:
           cpus: '4'
-          memory: 1048M
+          memory: 1024M
     expose:
       - "1001"
     env_file:
@@ -53,6 +48,8 @@ services:
     image: ghcr.io/marmevladek/architecture-of-highload-applications/deck-service:latest
     ports:
       - "1002:1002"
+    volumes:
+      - ./infrastructure-services/tsung/:/tsung/config
     env_file:
       - ./deck-service/.env
   #    depends_on:
