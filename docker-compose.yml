@@ -6,24 +6,18 @@ services:
     build:
       context: ./profile-service
       dockerfile: Dockerfile
-    image: profile-service:latest
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpus: '1'
-          memory: 256M
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/profile-service:latest
     ports:
       - "1000:1000"
     env_file:
       - ./profile-service/.env
     environment:
       SPRING_REDIS_HOST: redis
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:1000/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:1000/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
     depends_on:
       - postgres-master-profile
       - redis
@@ -35,11 +29,11 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/marmevladek/architecture-of-highload-applications/swipe-service:latest
     deploy:
-      replicas: 2
+#      replicas: 2
       resources:
         limits:
-          cpus: '3'
-          memory: 2048M
+          cpus: '4'
+          memory: 1048M
     expose:
       - "1001"
     env_file:
@@ -56,13 +50,7 @@ services:
     build:
       context: ./deck-service
       dockerfile: Dockerfile
-    image: deck-service:latest
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
+    image: ghcr.io/marmevladek/architecture-of-highload-applications/deck-service:latest
     ports:
       - "1002:1002"
     env_file:
@@ -75,12 +63,6 @@ services:
       context: ./notification-service
       dockerfile: Dockerfile
     image: ghcr.io/marmevladek/architecture-of-highload-applications/notification-service:latest
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
     ports:
       - "1003:1003"
     env_file:
