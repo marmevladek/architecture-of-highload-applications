@@ -1,7 +1,10 @@
 package ru.dating.app.deckservice.external.decoder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import feign.Request.HttpMethod;
 import feign.Response;
+import feign.RetryableException;
 import feign.codec.ErrorDecoder;
 import lombok.extern.log4j.Log4j2;
 import ru.dating.app.deckservice.exception.CustomException;
@@ -12,24 +15,45 @@ import java.io.IOException;
 @Log4j2
 public class CustomErrorDecoder implements ErrorDecoder {
 
-    @Override
-    public Exception decode(String s, Response response) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-        log.info("::{}", response.request().url());
-        log.info("::{}", response.request().headers());
+    @Override
+    public Exception decode(String methodKey, Response response) {
+        log.info("Feign request URL: {}", response.request().url());
+        log.info("Feign request headers: {}", response.request().headers());
 
         try {
-            ErrorResponse errorResponse = objectMapper
-                    .readValue(response.body().asInputStream(), ErrorResponse.class);
+            ErrorResponse errorResponse = objectMapper.readValue(
+                    response.body().asInputStream(), ErrorResponse.class);
 
-            return new CustomException(errorResponse.getErrorMessage(),
-                    errorResponse.getErrorCode(), response.status());
+            int status = response.status();
+
+            if (status == 502 || status == 503 || status == 504) {
+                // retryAfter — можно указать null или время в миллисекундах, если знаешь
+                return new RetryableException(
+                        status,
+                        errorResponse.getErrorMessage(),
+                        response.request().httpMethod(),
+                        (Throwable) null,          // Throwable cause - нет
+                        (Long) null,          // retryAfter - не указываем задержку, будет дефолт
+                        response.request()
+                );
+            }
+
+            return new CustomException(
+                    errorResponse.getErrorMessage(),
+                    errorResponse.getErrorCode(),
+                    status
+            );
+
         } catch (IOException e) {
-            throw new CustomException(
-                    "Internal Server Error",
-                    "INTERNAL_SERVER_ERROR",
-                    500
+            return new RetryableException(
+                    500,
+                    "IOException during error decode",
+                    response.request().httpMethod(),
+                    (Throwable) e,
+                    (Long) null,
+                    response.request()
             );
         }
     }

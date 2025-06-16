@@ -57,6 +57,4 @@ public class DeckServiceImpl implements DeckService {
             generateDeck(profile.getId());
         }
     }
-
-
 }
