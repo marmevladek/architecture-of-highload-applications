@@ -6,7 +6,7 @@ services:
     build:
       context: ./profile-service
       dockerfile: Dockerfile
-    image: ghcr.io/marmevladek/architecture-of-highload-applications/profile-service:latest
+    image: profile-service:latest
     deploy:
       replicas: 2
       resources:
@@ -19,10 +19,15 @@ services:
       - ./profile-service/.env
     environment:
       SPRING_REDIS_HOST: redis
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:1000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       - postgres-master-profile
       - redis
-#      - logstash
+  #      - logstash
 
   swipe-service:
     build:
@@ -30,11 +35,11 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/marmevladek/architecture-of-highload-applications/swipe-service:latest
     deploy:
-      replicas: 3
+      replicas: 2
       resources:
         limits:
-          cpus: '2'
-          memory: 1024M
+          cpus: '3'
+          memory: 2048M
     expose:
       - "1001"
     env_file:
@@ -51,8 +56,9 @@ services:
     build:
       context: ./deck-service
       dockerfile: Dockerfile
-    image: ghcr.io/marmevladek/architecture-of-highload-applications/deck-service:latest
+    image: deck-service:latest
     deploy:
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
@@ -61,9 +67,8 @@ services:
       - "1002:1002"
     env_file:
       - ./deck-service/.env
-    depends_on:
-      - profile-service
-#      - logstash
+  #    depends_on:
+  #      - logstash
 
   notification-service:
     build:
@@ -270,10 +275,11 @@ services:
       - "9187:9187"
 
   tsung:
-    container_name: tsung
-    build:
-      context: infrastructure-services/tsung
-      dockerfile: Dockerfile
+    #    container_name: tsung
+    #    build:
+    #      context: infrastructure-services/tsung
+    #      dockerfile: Dockerfile
+#    image: tsung:latest
     image: ghcr.io/marmevladek/architecture-of-highload-applications/tsung:latest
     ports:
       - ${TSUNG_OUTER_PORT:-8091}:${TSUNG_INNER_PORT:-8091}
